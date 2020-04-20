@@ -1,0 +1,9 @@
+a.out
+.vscode
+*.o
+.DS_Store
+.idea/
+CMakeLists.txt
+cmake-build-debug/
+pkg/
+bin/
