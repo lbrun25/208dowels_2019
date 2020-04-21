@@ -3,7 +3,6 @@ package neutrinos
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"utils"
 )
 
@@ -49,23 +48,20 @@ func CheckHelp() bool {
 
 // CheckNextValueFormat - check next value that is entered in the input
 func CheckNextValueFormat(input string) bool {
-	var re = regexp.MustCompile("[0-9]")
-
-	match := re.FindString(input)
-	if len(match) != len(input) {
+	if !utils.IsInteger(input) {
 		fmt.Println(wrongNextValueFormat)
 		return false
 	}
 	resInt := utils.ConvertStringToInt(input)
-	if (resInt == 0) {
-		fmt.Printf(mustBeGreatherThanZero)
+	if (resInt <= 0) {
+		fmt.Printf("The next value %s", mustBeGreatherThanZero)
 		return false
 	}
 	return true;
 }
 
 func getIntegerPositiveValueGreaterThanZero(valueName string, arg string) (bool, int) {
-	if !utils.IsPositiveInteger(arg) {
+	if !utils.IsInteger(arg) {
 		printError(valueName, mustBePositiveInteger)
 		return false, -1
 	}
@@ -78,7 +74,7 @@ func getIntegerPositiveValueGreaterThanZero(valueName string, arg string) (bool,
 }
 
 func getFloatPositiveValueGreaterThanZero(valueName string, arg string) (bool, float64) {
-	if !utils.IsPositiveFloat(arg) {
+	if !utils.IsFloat(arg) {
 		printError(valueName, mustBePositiveFloat)
 		return false, -1
 	}

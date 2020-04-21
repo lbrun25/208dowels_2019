@@ -4,8 +4,8 @@ import (
 	"regexp"
 )
 
-// IsPositiveInteger - check if the value is a positive integer
-func IsPositiveInteger(arg string) bool {
+// IsInteger - check if the value is a positive integer
+func IsInteger(arg string) bool {
 	var re = regexp.MustCompile("[-+]?\\d+")
 
 	match := re.FindString(arg)
@@ -15,9 +15,9 @@ func IsPositiveInteger(arg string) bool {
 	return true
 }
 
-// IsPositiveFloat - check if the value is a positive float
-func IsPositiveFloat(arg string) bool {
-	var re = regexp.MustCompile("[-+]?\\d+")
+// IsFloat - check if the value is a positive float
+func IsFloat(arg string) bool {
+	var re = regexp.MustCompile("[+-]?([0-9]*[.])?[0-9]+")
 
 	match := re.FindString(arg)
 	if len(arg) != len(match) {
