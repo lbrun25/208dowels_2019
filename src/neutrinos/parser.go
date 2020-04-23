@@ -95,7 +95,7 @@ func CheckArgs() bool {
 			if !status {
 				return false
 			}
-			A.numberValues = integer
+			V.numberValues = integer
 		}
 
 		// Check and assign a
@@ -104,7 +104,7 @@ func CheckArgs() bool {
 			if !status {
 				return false
 			}
-			A.arithmeticMean = float
+			V.arithmeticMean = float
 		}
 
 		// Check and assign h
@@ -113,7 +113,7 @@ func CheckArgs() bool {
 			if !status {
 				return false
 			}
-			A.harmonicMean = float
+			V.harmonicMean = float
 		}
 
 		// Check and assign sd
@@ -122,7 +122,7 @@ func CheckArgs() bool {
 			if !status {
 				return false
 			}
-			A.standardDeviation = float
+			V.standardDeviation = float
 		}
 	}
 	return true

@@ -8,29 +8,30 @@ import (
 const (
 )
 
-// A - Struct which holds arguments
-var A = Args{}
+// Values - Struct which holds values
+var V = Values{}
 
-type Args struct {
+type Values struct {
 	numberValues int
 	arithmeticMean float64
 	harmonicMean float64
 	standardDeviation float64
+	rootMeanSquare float64
 }
 
-func (a Args) NumberValues() float64 {
-	return float64(a.numberValues)
+func (v Values) NumberValues() float64 {
+	return float64(v.numberValues)
 }
 
 // NextValue - next value given in the input
 var NextValue = 1.0
 
 func displayResults() {
-	fmt.Printf("\tNumber of values:   %d\n", A.numberValues)
-	fmt.Printf("\tStandard deviation: %.2f\n", A.standardDeviation)
-	fmt.Printf("\tArithmetic mean:    %.2f\n", A.arithmeticMean)
-	fmt.Printf("\tRoot mean square:   %.2f\n", 0.0)
-	fmt.Printf("\tHarmonic means:     %.2f\n\n", A.harmonicMean)
+	fmt.Printf("\tNumber of values:   %d\n", V.numberValues)
+	fmt.Printf("\tStandard deviation: %.2f\n", V.standardDeviation)
+	fmt.Printf("\tArithmetic mean:    %.2f\n", V.arithmeticMean)
+	fmt.Printf("\tRoot mean square:   %.2f\n", V.rootMeanSquare)
+	fmt.Printf("\tHarmonic means:     %.2f\n\n", V.harmonicMean)
 }
 
 func updateValues() {
@@ -38,7 +39,6 @@ func updateValues() {
 	GetRootMeanSquare()
 	GetStandardDeviation()
 	GetArithmeticMean()
-	GetRootMeanSquare()
 	GetHarmonicMean()
 }
 
