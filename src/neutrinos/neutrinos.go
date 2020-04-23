@@ -50,7 +50,6 @@ func Neutrinos() {
 	for ;; {
 		fmt.Printf("Enter next value: ")
 		_, _ = fmt.Scanln(&input)
-		fmt.Println("")
 
 		if input == "END" {
 			break
