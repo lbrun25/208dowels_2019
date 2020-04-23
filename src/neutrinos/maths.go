@@ -22,9 +22,8 @@ func GetStandardDeviation() float64 {
 
 // GetArithmeticMean - Get arithmetic mean
 func GetArithmeticMean() float64 {
-	sum := (A.arithmeticMean * (A.NumberValues() - 1)) + NextValue
-	res := A.NumberValues() / sum
-	//A.arithmeticMean = res
+	res := A.arithmeticMean - (A.arithmeticMean / A.NumberValues()) + (NextValue / A.NumberValues())
+	A.arithmeticMean = res
 	return res
 }
 
