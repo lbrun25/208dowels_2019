@@ -29,10 +29,19 @@ func GetArithmeticMean() float64 {
 
 // GetRootMeanSquare - Get root mean square
 func GetRootMeanSquare() float64 {
-	return 0.0
+	numerator := math.Pow(A.standardDeviation, 2) * A.NumberValues() - math.Pow(A.standardDeviation, 2) +
+		math.Pow(A.arithmeticMean, 2) * A.NumberValues() - math.Pow(A.arithmeticMean, 2) +
+		math.Pow(NextValue, 2)
+	denominator := A.NumberValues()
+	res := math.Sqrt(numerator / denominator)
+	return res
 }
 
 // GetHarmonicMean - Get harmonic mean
 func GetHarmonicMean() float64 {
-	return 0.0
+	numerator := NextValue * A.NumberValues() * A.harmonicMean
+	denominator := NextValue * (A.NumberValues() - 1) + A.harmonicMean
+	res := numerator / denominator
+	A.harmonicMean = res
+	return res
 }

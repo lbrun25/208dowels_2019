@@ -17,20 +17,6 @@ const (
 	minArg = 4
 )
 
-// A - Struct which holds arguments
-var A = Args{}
-
-type Args struct {
-	numberValues int
-	arithmeticMean float64
-	harmonicMean float64
-	standardDeviation float64
-}
-
-func (a Args) NumberValues() float64 {
-	return float64(a.numberValues)
-}
-
 func printError(valueName string, errorMessage string) {
 	fmt.Printf("Error: '%s' %s\n", valueName, errorMessage)
 }
@@ -58,7 +44,7 @@ func CheckNextValueFormat(input string) (bool, int) {
 		fmt.Printf("The next value %s", mustBeGreatherThanZero)
 		return false, -1
 	}
-	return true, resInt;
+	return true, resInt
 }
 
 func getIntegerPositiveValueGreaterThanZero(valueName string, arg string) (bool, int) {
