@@ -8,6 +8,9 @@ import (
 const (
 )
 
+// NextValue - next value given in the input
+var NextValue = 1.0
+
 func printNumberRecordedValues() {
 	fmt.Printf("\tNumber of values:   %d\n", GetNumberRecordedValues())
 }
@@ -34,16 +37,18 @@ func Neutrinos() {
 
 	for ;; {
 		fmt.Printf("Enter next value: ")
-		fmt.Scanln(&input)
-		if !CheckNextValueFormat(input) {
-			os.Exit(84)
-		}
+		_, _ = fmt.Scanln(&input)
 		// TODO: Delete this line when I will finish the project
 		fmt.Println("")
 
 		if input == "END" {
 			break
 		}
+		status, value := CheckNextValueFormat(input)
+		if !status {
+			os.Exit(84)
+		}
+		NextValue = float64(value)
 		printNumberRecordedValues()
 		printStandardDeviation()
 		printArithmeticMean()

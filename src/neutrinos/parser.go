@@ -12,23 +12,24 @@ const (
 	mustBePositiveInteger = "must be a positive integer.\n"
 	mustBePositiveFloat = "must be a positive float.\n"
 	mustBeGreatherThanZero = "must be greater than zero.\n"
-	theValueMustBeGreatherThanZero = "The value must be greater than zero.\n"
 	wrongNextValueFormat = "Wrong next value's format which must be a positive integer."
 	maxArg = 4
 	minArg = 4
 )
 
-// NumberValues - number of values
-var NumberValues int = 0
+// A - Struct which holds arguments
+var A = Args{}
 
-// ArithmeticMean - arithmetic mean
-var ArithmeticMean float64 = 0.0
+type Args struct {
+	numberValues int
+	arithmeticMean float64
+	harmonicMean float64
+	standardDeviation float64
+}
 
-// HarmonicMean - harmonic mean
-var HarmonicMean float64 = 0.0
-
-// StandardDeviation - standard deviation
-var StandardDeviation float64 = 0.0
+func (a Args) NumberValues() float64 {
+	return float64(a.numberValues)
+}
 
 func printError(valueName string, errorMessage string) {
 	fmt.Printf("Error: '%s' %s\n", valueName, errorMessage)
@@ -39,7 +40,7 @@ func CheckHelp() bool {
 	argsWithoutProg := os.Args[1:]
 
 	for _, arg := range argsWithoutProg {
-		if (arg == "-h") {
+		if arg == "-h" {
 			return true
 		}
 	}
@@ -47,17 +48,17 @@ func CheckHelp() bool {
 }
 
 // CheckNextValueFormat - check next value that is entered in the input
-func CheckNextValueFormat(input string) bool {
+func CheckNextValueFormat(input string) (bool, int) {
 	if !utils.IsInteger(input) {
 		fmt.Println(wrongNextValueFormat)
-		return false
+		return false, -1
 	}
 	resInt := utils.ConvertStringToInt(input)
-	if (resInt <= 0) {
+	if resInt <= 0 {
 		fmt.Printf("The next value %s", mustBeGreatherThanZero)
-		return false
+		return false, -1
 	}
-	return true;
+	return true, resInt;
 }
 
 func getIntegerPositiveValueGreaterThanZero(valueName string, arg string) (bool, int) {
@@ -66,7 +67,7 @@ func getIntegerPositiveValueGreaterThanZero(valueName string, arg string) (bool,
 		return false, -1
 	}
 	integer := utils.ConvertStringToInt(arg)
-	if (integer <= 0) {
+	if integer <= 0 {
 		printError(valueName, mustBeGreatherThanZero)
 		return false, -1
 	}
@@ -79,7 +80,7 @@ func getFloatPositiveValueGreaterThanZero(valueName string, arg string) (bool, f
 		return false, -1
 	}
 	float := utils.ConvertStringToFloat(arg)
-	if (float <= 0) {
+	if float <= 0 {
 		printError(valueName, mustBeGreatherThanZero)
 		return false, -1
 	}
@@ -105,37 +106,37 @@ func CheckArgs() bool {
 		// Check and assign n
 		if valueName == "n" {
 			status, integer := getIntegerPositiveValueGreaterThanZero(valueName, arg)
-			if (!status) {
-				return false;
+			if !status {
+				return false
 			}
-			NumberValues = integer
+			A.numberValues = integer
 		}
 
 		// Check and assign a
 		if valueName == "a" {
 			status, float := getFloatPositiveValueGreaterThanZero(valueName, arg)
-			if (!status) {
-				return false;
+			if !status {
+				return false
 			}
-			ArithmeticMean = float
+			A.arithmeticMean = float
 		}
 
 		// Check and assign h
 		if valueName == "h" {
 			status, float := getFloatPositiveValueGreaterThanZero(valueName, arg)
-			if (!status) {
-				return false;
+			if !status {
+				return false
 			}
-			HarmonicMean = float
+			A.harmonicMean = float
 		}
 
 		// Check and assign sd
 		if valueName == "sd" {
 			status, float := getFloatPositiveValueGreaterThanZero(valueName, arg)
-			if (!status) {
-				return false;
+			if !status {
+				return false
 			}
-			StandardDeviation = float
+			A.standardDeviation = float
 		}
 	}
 	return true
