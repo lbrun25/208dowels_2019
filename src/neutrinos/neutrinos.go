@@ -31,7 +31,7 @@ func displayResults() {
 	fmt.Printf("\tStandard deviation: %.2f\n", V.standardDeviation)
 	fmt.Printf("\tArithmetic mean:    %.2f\n", V.arithmeticMean)
 	fmt.Printf("\tRoot mean square:   %.2f\n", V.rootMeanSquare)
-	fmt.Printf("\tHarmonic means:     %.2f\n\n", V.harmonicMean)
+	fmt.Printf("\tHarmonic mean:     %.2f\n\n", V.harmonicMean)
 }
 
 func updateValues() {
