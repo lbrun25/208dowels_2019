@@ -43,7 +43,6 @@ func updateValues() {
 }
 
 // Neutrinos - main
-// TODO: Delete this line when I will finish the project
 func Neutrinos() {
 	var input string
 
