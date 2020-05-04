@@ -2,30 +2,27 @@ package main
 
 import (
     "fmt"
-    "neutrinos"
+	"dowels"
     "os"
 )
 
 func printHelp() {
     fmt.Println("USAGE")
-    fmt.Println("\t./206neutrinos n a h sd")
+    fmt.Println("\t./208dowels O0 O1 O2 O3 O4 O5 O6 O7 O8")
     fmt.Println("")
     fmt.Println("DESCRIPTION")
-    fmt.Println("\tn\t\tnumber of values")
-    fmt.Println("\ta\t\tarithmetic mean")
-    fmt.Println("\th\t\tharmonic mean")
-    fmt.Println("\tsd\t\tstandard deviation")
+    fmt.Println("\tOi\tsize of the observed class")
 }
 
 func main() {
-    if neutrinos.CheckHelp() {
+    if dowels.CheckHelp() {
         printHelp()
         os.Exit(0)
     }
-    if !neutrinos.CheckArgs() {
+    if !dowels.CheckArgs() {
         printHelp()
         os.Exit(84)
     }
-    neutrinos.Neutrinos()
+    dowels.Dowels()
     os.Exit(0)
 }

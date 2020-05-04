@@ -12,7 +12,7 @@ GOCLEAN = $(GOCMD) clean
 GOTEST = $(GOCMD) test
 GOGET = $(GOCMD) get
 GOENV = $(GOCMD) env
-BINARY_NAME = 206neutrinos
+BINARY_NAME = 208dowels
 BINARY_UNIX = $(BINARY_NAME)_unix
 
 RM = rm -f
