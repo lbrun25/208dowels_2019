@@ -9,9 +9,10 @@ const (
 var O []int
 
 func displayResults() {
-	for i, o := range O {
-		fmt.Println(i, "=", o)
-	}
+	fmt.Printf("Distribution:           B(100, %.4f)\n", GetProbability())
+	fmt.Printf("Chi-squared:            %.3f\n", GetChiSquared())
+	fmt.Printf("Degrees of freedom:     %d\n", GetFreedomDegrees())
+	fmt.Printf("Fit validity:           %.2f\n", 0.0)
 }
 
 // Dowels - main
