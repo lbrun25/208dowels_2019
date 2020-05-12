@@ -96,7 +96,7 @@ func RemoveIndex(s []float64, index int) []float64 {
 	return append(s[:index], s[index+1:]...)
 }
 
-func getD(c []float64, tx[]float64) float64 {
+func getD(c [][]float64, tx[]float64) float64 {
 	sumLhs := 0.0
 	sumRhs := 0.0
 	sumRes := 0.0
@@ -109,23 +109,28 @@ func getD(c []float64, tx[]float64) float64 {
 	return sumRes
 }
 
-func ComputeSquareDifference(tx []float64) ([]float64, float64) {
-	var c []float64
-	for i := 0.0; i < 9.0; i += 1 {
-		c = append(c, i)
+func ComputeSquareDifference(tx []float64) ([][]float64, float64) {
+	n := 9
+	m := 1
+	c := make([][]float64, n)
+	rows := make([]float64, n * m)
+	for i := 0; i < n; i++ {
+		c[i] = rows[i * m : (i + 1) * m]
+		c[i][0] = float64(i)
 	}
+
 	for i := 0; i < len(c); {
-		sum := getSumOx(i)
-		if sum >= 10 {
+		fmt.Println("sum = ", getSumOx(i))
+		if getSumOx(i) >= 10 {
 			i++
 			continue
 		} else if i + 1 == len(c) || (i > 0 && getSumOx(i - 1) < getSumOx(i + 1)) {
-			c[i - 1] += c[i]
-			c = RemoveIndex(c, i)
+			c[i - 1] = append(c[i - 1], c[i][0])
+			c[i] = append(c[i][:0], c[i][0+1:]...)
 			i -= 1
 		} else {
-			c[i] += c[i + 1]
-			c = RemoveIndex(c, i + 1)
+			c[i] = append(c[i], c[i + 1]...)
+			c = append(c[:i + 1], c[i + 2:]...)
 		}
 	}
 	d := getD(c, tx)
