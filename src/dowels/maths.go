@@ -83,10 +83,10 @@ func getBinomial(n int64, k int64, p float64) float64 {
 	return resConverted
 }
 
-func getSumOx(i int) int {
+func getSumOx(c []float64) int {
 	sum := 0
 
-	for j := 0; j < i; j++ {
+	for j, _ := range c {
 		sum += O[j]
 	}
 	return sum
@@ -120,11 +120,11 @@ func ComputeSquareDifference(tx []float64) ([][]float64, float64) {
 	}
 
 	for i := 0; i < len(c); {
-		fmt.Println("sum = ", getSumOx(i))
-		if getSumOx(i) >= 10 {
+		fmt.Println("sum = ", getSumOx(c[i]))
+		if getSumOx(c[i]) >= 10 {
 			i++
 			continue
-		} else if i + 1 == len(c) || (i > 0 && getSumOx(i - 1) < getSumOx(i + 1)) {
+		} else if i + 1 == len(c) || (i > 0 && getSumOx(c[i - 1]) < getSumOx(c[i + 1])) {
 			c[i - 1] = append(c[i - 1], c[i][0])
 			c[i] = append(c[i][:0], c[i][0+1:]...)
 			i -= 1
