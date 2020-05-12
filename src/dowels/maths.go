@@ -1,7 +1,11 @@
 package dowels
 
 import (
+	"fmt"
 	"math"
+	"math/big"
+	"os"
+	"utils"
 )
 
 var distributionTable = [][]float64 {
@@ -27,7 +31,129 @@ func GetProbability() float64 {
 	return res
 }
 
+// Factorial - Get factorial big int
+func Factorial(x *big.Int) *big.Int {
+	result := big.NewInt(1)
+	i := big.NewInt(2)
+
+	if !x.IsInt64() {
+		fmt.Println("The number is way too big to calculate a factorial")
+		os.Exit(84)
+	}
+	for i.Cmp(x) != 1 {
+		result.Mul(result, i)
+		i = i.Add(i, big.NewInt(1))
+	}
+	return result
+}
+
+func getBinomialCoefficient(n *big.Int, k *big.Int) *big.Int {
+	if k.Cmp(n) == 1 {
+		fmt.Println("Error: k > n")
+		os.Exit(84)
+	}
+
+	numerator := Factorial(n)
+	subNK := big.NewInt(1).Sub(n, k)
+	denominator := big.NewInt(1).Mul(Factorial(k), Factorial(subNK))
+	res := big.NewInt(1).Div(numerator, denominator)
+	return res
+}
+
+// BigPow - big Float
+func BigPow(a *big.Float, e int64) *big.Float {
+	if e == 0 {
+		return big.NewFloat(1.0)
+	}
+	result := big.NewFloat(0.0).Copy(a)
+	for i := int64(0); i < e - 1; i++ {
+		result = result.Mul(result, a)
+	}
+	return result
+}
+
+func getBinomial(n int64, k int64, p float64) float64 {
+	res := big.NewFloat(0.0).Mul(
+		big.NewFloat(0.0).SetInt(getBinomialCoefficient(big.NewInt(0.0).SetInt64(n), big.NewInt(0.0).SetInt64(k))),
+		BigPow(big.NewFloat(0.0).SetFloat64(p), k))
+	res.Mul(res, BigPow(big.NewFloat(0.0).Sub(big.NewFloat(1.0), big.NewFloat(0.0).SetFloat64(p)), n - k))
+
+	s := fmt.Sprintf("%f", res)
+	resConverted := utils.ConvertStringToFloat(s)
+	return resConverted
+}
+
+func getSumOx(i int) int {
+	sum := 0
+
+	for j := 0; j < i; j++ {
+		sum += O[j]
+	}
+	return sum
+}
+
+func RemoveIndex(s []float64, index int) []float64 {
+	return append(s[:index], s[index+1:]...)
+}
+
+func getD(c []float64, tx[]float64) float64 {
+	sumLhs := 0.0
+	sumRhs := 0.0
+	sumRes := 0.0
+
+	for i, _ := range c {
+		sumLhs += math.Pow(float64(O[i]) - tx[i], 2)
+		sumRhs += tx[i]
+		sumRes += sumLhs / sumRhs
+	}
+	return sumRes
+}
+
+func ComputeSquareDifference(tx []float64) ([]float64, float64) {
+	var c []float64
+	for i := 0.0; i < 9.0; i += 1 {
+		c = append(c, i)
+	}
+	for i := 0; i < len(c); {
+		sum := getSumOx(i)
+		if sum >= 10 {
+			i++
+			continue
+		} else if i + 1 == len(c) || (i > 0 && getSumOx(i - 1) < getSumOx(i + 1)) {
+			c[i - 1] += c[i]
+			c = RemoveIndex(c, i)
+			i -= 1
+		} else {
+			c[i] += c[i + 1]
+			c = RemoveIndex(c, i + 1)
+		}
+	}
+	d := getD(c, tx)
+	return c, d
+}
+
+func getSum(slice []float64) float64 {
+	sum := 0.0
+
+	for _, e := range slice {
+		sum += e
+	}
+	return sum
+}
+
 func GetChiSquared() float64 {
+	var tx []float64
+	p := GetProbability()
+
+	for i, _ := range O[0:8] {
+		tx = append(tx, 100 * getBinomial(100, int64(i), p))
+	}
+	tx = append(tx, 100 - getSum(tx))
+
+	c, d := ComputeSquareDifference(tx)
+	fmt.Println("c = ", c)
+	fmt.Printf("d = %f\n", d)
+
 	return 0.0
 }
 
