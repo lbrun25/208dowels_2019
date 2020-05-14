@@ -98,59 +98,48 @@ func RemoveIndex(s []float64, index int) []float64 {
 }
 
 func getD(c [][]float64, tx[]float64) float64 {
-	//sumLhs := 0.0
-	//sumRhs := 0.0
 	sumRes := 0.0
 
 	// Copy c to txTmp
 	txTmp := make([][]float64, len(c))
+	lhs := make([][]float64, len(c))
 	for i := range c {
 		txTmp[i] = make([]float64, len(c[i]))
-		//copy(txTmp[i], tx[i])
+		lhs[i] = make([]float64, len(c[i]))
 	}
+
+	// Fill
 	k := 0
-	fmt.Println("tx = ", tx)
 	for i, r := range txTmp {
 		for j := range r {
 			txTmp[i][j] = tx[k]
+			lhs[i][j] = float64(O[k]) - tx[k]
 			k++
 		}
 	}
-	fmt.Println("txTmp = ", txTmp)
-	// SumTx
+
+	// Sum
 	var sumTxTmps []float64
+	var sumLhs []float64
 	for i, x := range c {
-		sum := 0.0ode
+		sum := 0.0
+		sumLhsRes := 0.0
 		for j, _ := range x {
 			sum += txTmp[i][j]
+			sumLhsRes += lhs[i][j]
 		}
 		sumTxTmps = append(sumTxTmps, sum)
+		sumLhs = append(sumLhs, sumLhsRes)
 	}
-	fmt.Println("len = ", len (sumTxTmps), " -- sumTxTmps = ", sumTxTmps)
 
-
-
-	//for _, x := range c {
-	//	for _, y := range x {
-	//		i := int(y)
-	//		txTmp[i] = append(txTmp[i], tx[i])
-	//	}
-	//}
-
-	//fmt.Println("tx = ", tx)
-
-
-	//for _, value := range c {
-	//	for _, j := range value {
-	//		i := int(j)
-	//		sumLhs += float64(O[i]) - tx[i]
-	//	}
-	//	for _, j := range value {
-	//		i := int(j)
-	//		sumRhs += tx[i]
-	//	}
-	//	sumRes += math.Pow(sumLhs, 2) / sumRhs
-	//}
+	// SumRes
+	for i := range sumTxTmps {
+		lhs := 0.0
+		if sumLhs != nil {
+			lhs = math.Pow(sumLhs[i], 2)
+		}
+		sumRes +=  lhs / sumTxTmps[i]
+	}
 	return sumRes
 }
 
