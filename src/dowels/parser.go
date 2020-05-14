@@ -51,7 +51,7 @@ func getIntegerPositiveValue(valueName string, arg string) (bool, int) {
 func checkSum() bool {
 	sum := 0
 
-	for _, value := range O {
+	for _, value := range Ox {
 		sum += value
 	}
 	if sum != 100 {
@@ -81,7 +81,7 @@ func CheckArgs() bool {
 		if !status {
 			return false
 		}
-		O = append(O, integer)
+		Ox = append(Ox, integer)
 	}
 	if !checkSum() {
 		return false

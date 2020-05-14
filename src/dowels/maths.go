@@ -39,13 +39,13 @@ var fits = []string {
 	"P < 1%",
 }
 
-var sumTxTmps []float64
+var sumTxSlice []float64
 
 // GetProbability - compute p
 func GetProbability() float64 {
 	sum := 0.0
 
-	for i, o := range O {
+	for i, o := range Ox {
 		sum += float64(i * o)
 	}
 	res := sum / math.Pow(10, 4)
@@ -109,17 +109,15 @@ func getSumOx(c []float64) int {
 
 	for _, value := range c {
 		i := int(value)
-		sum += O[i]
+		sum += Ox[i]
 	}
 	return sum
 }
 
-func RemoveIndex(s []float64, index int) []float64 {
-	return append(s[:index], s[index+1:]...)
-}
-
 func getD() float64 {
 	sumRes := 0.0
+	c := Dowels.c
+	tx := Dowels.tx
 
 	// Copy c to txTmp
 	txTmp := make([][]float64, len(c))
@@ -134,7 +132,7 @@ func getD() float64 {
 	for i, r := range txTmp {
 		for j := range r {
 			txTmp[i][j] = tx[k]
-			lhs[i][j] = float64(O[k]) - tx[k]
+			lhs[i][j] = float64(Ox[k]) - tx[k]
 			k++
 		}
 	}
@@ -148,17 +146,17 @@ func getD() float64 {
 			sum += txTmp[i][j]
 			sumLhsRes += lhs[i][j]
 		}
-		sumTxTmps = append(sumTxTmps, sum)
+		sumTxSlice = append(sumTxSlice, sum)
 		sumLhs = append(sumLhs, sumLhsRes)
 	}
 
 	// SumRes
-	for i := range sumTxTmps {
+	for i := range sumTxSlice {
 		lhs := 0.0
 		if sumLhs != nil {
 			lhs = math.Pow(sumLhs[i], 2)
 		}
-		sumRes +=  lhs / sumTxTmps[i]
+		sumRes +=  lhs / sumTxSlice[i]
 	}
 	return sumRes
 }
@@ -203,8 +201,8 @@ func getSum(slice []float64) float64 {
 func CreateTx() []float64 {
 	var tx []float64
 
-	for i := range O[0:8] {
-		tx = append(tx, 100 * getBinomial(100, int64(i), p))
+	for i := range Ox[0:8] {
+		tx = append(tx, 100 * getBinomial(100, int64(i), Dowels.p))
 	}
 	tx = append(tx, 100 - getSum(tx))
 	return tx
@@ -226,6 +224,8 @@ func printRow(slice interface{}, format string, start string, delimiter string, 
 }
 
 func PrintTab() {
+	c := Dowels.c
+
 	// First row
 	var xSlice []string
 
@@ -257,12 +257,13 @@ func PrintTab() {
 	printRow(sumOx, "%d", "  Ox\t| ", "\t| ", "100")
 
 	// Third row
-	printRow(sumTxTmps, "%.1f","  Tx\t| ", "\t| ", "100")
+	printRow(sumTxSlice, "%.1f","  Tx\t| ", "\t| ", "100")
 }
 
 // GetFreedomDegrees - get degrees of freedom
 func GetFreedomDegrees() int {
-	degrees := len(c) - 2
+	degrees := len(Dowels.c) - 2
+
 	if degrees < 1 {
 		printError("Something went wrong, degrees of freedom must be greater than one")
 		os.Exit(84)
@@ -273,8 +274,9 @@ func GetFreedomDegrees() int {
 // GetFitValidity - get fits validity
 func GetFitValidity() string {
 	i := len(fits) - 1
-	for j, l := range distributionTable[v - 1] {
-		if d < l {
+
+	for j, l := range distributionTable[Dowels.v - 1] {
+		if Dowels.d < l {
 			i = j
 			break
 		}

@@ -23,6 +23,6 @@ func main() {
         printHelp()
         os.Exit(84)
     }
-    dowels.Dowels()
+    dowels.Main()
     os.Exit(0)
 }
