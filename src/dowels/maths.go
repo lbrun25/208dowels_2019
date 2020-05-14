@@ -21,6 +21,25 @@ var distributionTable = [][]float64 {
 	{2.09, 4.17, 5.38, 6.39, 7.36, 8.34, 9.41, 10.66, 12.24, 14.68, 16.92, 19.63, 21.67},
 	{2.56, 4.87, 6.18, 7.27, 8.30, 9.34, 10.47, 11.78, 13.44, 15.99, 18.31, 21.16, 23.21}}
 
+var fit = []string {
+	"P > 99%",
+	"90% < P < 99%",
+	"80% < P < 90%",
+	"70% < P < 80%",
+	"60% < P < 70%",
+	"50% < P < 60%",
+	"40% < P < 50%",
+	"30% < P < 40%",
+	"20% < P < 30%",
+	"10% < P < 20%",
+	"5% < P < 10%",
+	"2% < P < 5%",
+	"1% < P < 2%",
+	"P < 1%",
+}
+
+var sumTxTmps []float64
+
 // GetProbability - compute p
 func GetProbability() float64 {
 	sum := 0.0
@@ -98,9 +117,7 @@ func RemoveIndex(s []float64, index int) []float64 {
 	return append(s[:index], s[index+1:]...)
 }
 
-var sumTxTmps []float64
-
-func getD(c [][]float64, tx[]float64) float64 {
+func getD() float64 {
 	sumRes := 0.0
 
 	// Copy c to txTmp
@@ -145,13 +162,13 @@ func getD(c [][]float64, tx[]float64) float64 {
 	return sumRes
 }
 
-func ComputeSquareDifference(tx []float64) ([][]float64, float64) {
-	n := 9
-	m := 1
-	c := make([][]float64, n)
-	rows := make([]float64, n * m)
-	for i := 0; i < n; i++ {
-		c[i] = rows[i * m : (i + 1) * m]
+func CreateMatrixSquare() [][]float64 {
+	row := 9
+	col := 1
+	c := make([][]float64, row)
+	rows := make([]float64, row * col)
+	for i := 0; i < row; i++ {
+		c[i] = rows[i * col : (i + 1) * col]
 		c[i][0] = float64(i)
 	}
 
@@ -170,8 +187,7 @@ func ComputeSquareDifference(tx []float64) ([][]float64, float64) {
 			c = append(c[:i + 1], c[i + 2:]...)
 		}
 	}
-	d := getD(c, tx)
-	return c, d
+	return c
 }
 
 func getSum(slice []float64) float64 {
@@ -183,22 +199,14 @@ func getSum(slice []float64) float64 {
 	return sum
 }
 
-func GetChiSquared() float64 {
+func CreateTx() []float64 {
 	var tx []float64
-	p := GetProbability()
 
-	for i, _ := range O[0:8] {
+	for i := range O[0:8] {
 		tx = append(tx, 100 * getBinomial(100, int64(i), p))
 	}
 	tx = append(tx, 100 - getSum(tx))
-
-	c, d := ComputeSquareDifference(tx)
-	fmt.Println("c = ", c)
-	fmt.Printf("d = %f\n", d)
-
-	formatArray(tx, d, c)
-
-	return d
+	return tx
 }
 
 func printRow(slice []float64, start string, delimiter string, end string) {
@@ -214,9 +222,7 @@ func printRow(slice []float64, start string, delimiter string, end string) {
 	fmt.Println(end)
 }
 
-func formatArray(tx []float64, d float64, c [][]float64) {
-	fmt.Printf("tx = %f\n\n", tx)
-
+func PrintTab() {
 	// First row
 	fmt.Printf(" x | ")
 	for i, x := range c {
@@ -243,34 +249,20 @@ func formatArray(tx []float64, d float64, c [][]float64) {
 
 	// Third row
 	printRow(sumTxTmps, " Tx | ", " | ", " | 100")
-
-	GetFreedomDegrees(c, d)
-}
-
-var fit = []string {
-	"P > 99%",
-	"90% < P < 99%",
-	"80% < P < 90%",
-	"70% < P < 80%",
-	"60% < P < 70%",
-	"50% < P < 60%",
-	"40% < P < 50%",
-	"30% < P < 40%",
-	"20% < P < 30%",
-	"10% < P < 20%",
-	"5% < P < 10%",
-	"2% < P < 5%",
-	"1% < P < 2%",
-	"P < 1%",
 }
 
 // GetFreedomDegrees - get degrees of freedom
-func GetFreedomDegrees(c [][]float64, d float64) int {
+func GetFreedomDegrees() int {
 	v := len(c) - 2
 	if v < 1 {
 		printError("v must be greater than one")
 		os.Exit(84)
 	}
+	return v
+}
+
+// GetFitValidity - get fit validity
+func GetFitValidity() string {
 	f := len(fit) - 1
 	for i, l := range distributionTable[v - 1] {
 		if d < l {
@@ -278,7 +270,5 @@ func GetFreedomDegrees(c [][]float64, d float64) int {
 			break
 		}
 	}
-	fmt.Println("Degree of freedom = ", v)
-	fmt.Println("Fit validity = ", fit[f])
-	return 0
+	return fit[f]
 }
