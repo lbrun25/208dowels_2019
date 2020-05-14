@@ -227,20 +227,18 @@ func printRow(slice interface{}, format string, start string, delimiter string, 
 
 func PrintTab() {
 	// First row
-	fmt.Printf("  x | ")
-	for i, x := range c {
+	var xSlice []string
+
+	for _, x := range c {
 		var values []string
 		for _, y := range x {
 			s := fmt.Sprintf("%d", int(y))
 			values = append(values, s)
 		}
 		result := strings.Join(values, "-")
-		if i == len(c) - 1 {
-			fmt.Printf("%s+ | Total\n", result)
-		} else {
-			fmt.Printf("%s | ", result)
-		}
+		xSlice = append(xSlice, result)
 	}
+	printRow(xSlice, "%s", "   x\t| ", "\t| ", "Total")
 
 	// Second row
 	var sumOx []int
@@ -248,10 +246,10 @@ func PrintTab() {
 	for _, x := range c {
 		sumOx = append(sumOx, getSumOx(x))
 	}
-	printRow(sumOx, "%d", "  Ox    | ", "\t| ", "100")
+	printRow(sumOx, "%d", "  Ox\t| ", "\t| ", "100")
 
 	// Third row
-	printRow(sumTxTmps, "%.1f","  Tx    | ", "\t| ", "100")
+	printRow(sumTxTmps, "%.1f","  Tx\t| ", "\t| ", "100")
 }
 
 // GetFreedomDegrees - get degrees of freedom
