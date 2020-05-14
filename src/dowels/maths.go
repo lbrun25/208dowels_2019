@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/big"
 	"os"
+	"strings"
 	"utils"
 )
 
@@ -97,6 +98,8 @@ func RemoveIndex(s []float64, index int) []float64 {
 	return append(s[:index], s[index+1:]...)
 }
 
+var sumTxTmps []float64
+
 func getD(c [][]float64, tx[]float64) float64 {
 	sumRes := 0.0
 
@@ -119,7 +122,6 @@ func getD(c [][]float64, tx[]float64) float64 {
 	}
 
 	// Sum
-	var sumTxTmps []float64
 	var sumLhs []float64
 	for i, x := range c {
 		sum := 0.0
@@ -194,10 +196,49 @@ func GetChiSquared() float64 {
 	fmt.Println("c = ", c)
 	fmt.Printf("d = %f\n", d)
 
-	return 0.0
+	formatArray(tx, d, c)
+
+	return d
+}
+
+func formatArray(tx []float64, d float64, c [][]float64) {
+	fmt.Printf("tx = %f\n\n", tx)
+
+	// First row
+	fmt.Printf(" x | ")
+	for i, x := range c {
+		var values []string
+		for _, y := range x {
+			s := fmt.Sprintf("%d", int(y))
+			values = append(values, s)
+		}
+		result := strings.Join(values, "-")
+		if i == len(c) - 1 {
+			fmt.Printf("%s+ | Total\n", result)
+		} else {
+			fmt.Printf("%s | ", result)
+		}
+	}
+
+	// Third row
+	fmt.Printf(" Tx | ")
+	for i, value := range sumTxTmps {
+		var values []string
+
+		s := fmt.Sprintf("%.1f", value)
+		values = append(values, s)
+		result := strings.Join(values, "-")
+		if i == len(c) - 1 {
+			fmt.Printf("%s | 100\n", result)
+		} else {
+			fmt.Printf("%s | ", result)
+		}
+	}
+
 }
 
 // GetFreedomDegrees - get degrees of freedom
 func GetFreedomDegrees() int {
+
 	return 0
 }
