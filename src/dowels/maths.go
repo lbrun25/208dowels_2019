@@ -86,8 +86,9 @@ func getBinomial(n int64, k int64, p float64) float64 {
 func getSumOx(c []float64) int {
 	sum := 0
 
-	for j, _ := range c {
-		sum += O[j]
+	for _, value := range c {
+		i := int(value)
+		sum += O[i]
 	}
 	return sum
 }
@@ -97,15 +98,59 @@ func RemoveIndex(s []float64, index int) []float64 {
 }
 
 func getD(c [][]float64, tx[]float64) float64 {
-	sumLhs := 0.0
-	sumRhs := 0.0
+	//sumLhs := 0.0
+	//sumRhs := 0.0
 	sumRes := 0.0
 
-	for i, _ := range c {
-		sumLhs += math.Pow(float64(O[i]) - tx[i], 2)
-		sumRhs += tx[i]
-		sumRes += sumLhs / sumRhs
+	// Copy c to txTmp
+	txTmp := make([][]float64, len(c))
+	for i := range c {
+		txTmp[i] = make([]float64, len(c[i]))
+		//copy(txTmp[i], tx[i])
 	}
+	k := 0
+	fmt.Println("tx = ", tx)
+	for i, r := range txTmp {
+		for j := range r {
+			txTmp[i][j] = tx[k]
+			k++
+		}
+	}
+	fmt.Println("txTmp = ", txTmp)
+	// SumTx
+	var sumTxTmps []float64
+	for i, x := range c {
+		sum := 0.0ode
+		for j, _ := range x {
+			sum += txTmp[i][j]
+		}
+		sumTxTmps = append(sumTxTmps, sum)
+	}
+	fmt.Println("len = ", len (sumTxTmps), " -- sumTxTmps = ", sumTxTmps)
+
+
+
+	//for _, x := range c {
+	//	for _, y := range x {
+	//		i := int(y)
+	//		txTmp[i] = append(txTmp[i], tx[i])
+	//	}
+	//}
+
+	//fmt.Println("tx = ", tx)
+
+
+	//for _, value := range c {
+	//	for _, j := range value {
+	//		i := int(j)
+	//		sumLhs += float64(O[i]) - tx[i]
+	//	}
+	//	for _, j := range value {
+	//		i := int(j)
+	//		sumRhs += tx[i]
+	//	}
+	//	sumRes += math.Pow(sumLhs, 2) / sumRhs
+	//}
 	return sumRes
 }
 
@@ -120,16 +165,17 @@ func ComputeSquareDifference(tx []float64) ([][]float64, float64) {
 	}
 
 	for i := 0; i < len(c); {
-		fmt.Println("sum = ", getSumOx(c[i]))
 		if getSumOx(c[i]) >= 10 {
 			i++
 			continue
-		} else if i + 1 == len(c) || (i > 0 && getSumOx(c[i - 1]) < getSumOx(c[i + 1])) {
-			c[i - 1] = append(c[i - 1], c[i][0])
-			c[i] = append(c[i][:0], c[i][0+1:]...)
+		} else if (i + 1 == len(c)) || (i > 0 && getSumOx(c[i - 1]) < getSumOx(c[i + 1])) {
+			c[i - 1] = append(c[i - 1], c[i]...)
+			// Delete row
+			c = append(c[:i], c[i + 1:]...)
 			i -= 1
 		} else {
 			c[i] = append(c[i], c[i + 1]...)
+			// Delete row
 			c = append(c[:i + 1], c[i + 2:]...)
 		}
 	}
