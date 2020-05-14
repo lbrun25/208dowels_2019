@@ -201,6 +201,19 @@ func GetChiSquared() float64 {
 	return d
 }
 
+func printRow(slice []float64, start string, delimiter string, end string) {
+	var values []string
+
+	fmt.Printf(start)
+	for _, value := range slice {
+		s := fmt.Sprintf("%.1f", value)
+		values = append(values, s)
+	}
+	result := strings.Join(values, delimiter)
+	fmt.Printf("%s", result)
+	fmt.Println(end)
+}
+
 func formatArray(tx []float64, d float64, c [][]float64) {
 	fmt.Printf("tx = %f\n\n", tx)
 
@@ -220,25 +233,52 @@ func formatArray(tx []float64, d float64, c [][]float64) {
 		}
 	}
 
-	// Third row
-	fmt.Printf(" Tx | ")
-	for i, value := range sumTxTmps {
-		var values []string
+	// Second row
+	var sumOx []float64
 
-		s := fmt.Sprintf("%.1f", value)
-		values = append(values, s)
-		result := strings.Join(values, "-")
-		if i == len(c) - 1 {
-			fmt.Printf("%s | 100\n", result)
-		} else {
-			fmt.Printf("%s | ", result)
-		}
+	for _, x := range c {
+		sumOx = append(sumOx, float64(getSumOx(x)))
 	}
+	printRow(sumOx, " Ox | ", " | ", " | 100")
 
+	// Third row
+	printRow(sumTxTmps, " Tx | ", " | ", " | 100")
+
+	GetFreedomDegrees(c, d)
+}
+
+var fit = []string {
+	"P > 99%",
+	"90% < P < 99%",
+	"80% < P < 90%",
+	"70% < P < 80%",
+	"60% < P < 70%",
+	"50% < P < 60%",
+	"40% < P < 50%",
+	"30% < P < 40%",
+	"20% < P < 30%",
+	"10% < P < 20%",
+	"5% < P < 10%",
+	"2% < P < 5%",
+	"1% < P < 2%",
+	"P < 1%",
 }
 
 // GetFreedomDegrees - get degrees of freedom
-func GetFreedomDegrees() int {
-
+func GetFreedomDegrees(c [][]float64, d float64) int {
+	v := len(c) - 2
+	if v < 1 {
+		printError("v must be greater than one")
+		os.Exit(84)
+	}
+	f := len(fit) - 1
+	for i, l := range distributionTable[v - 1] {
+		if d < l {
+			f = i
+			break
+		}
+	}
+	fmt.Println("Degree of freedom = ", v)
+	fmt.Println("Fit validity = ", fit[f])
 	return 0
 }
