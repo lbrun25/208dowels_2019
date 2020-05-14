@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/big"
 	"os"
+	"reflect"
 	"strings"
 	"utils"
 )
@@ -209,22 +210,24 @@ func CreateTx() []float64 {
 	return tx
 }
 
-func printRow(slice []float64, start string, delimiter string, end string) {
-	var values []string
-
-	fmt.Printf(start)
-	for _, value := range slice {
-		s := fmt.Sprintf("%.1f", value)
-		values = append(values, s)
+func printRow(slice interface{}, format string, start string, delimiter string, end string) {
+	s := reflect.ValueOf(slice)
+	if s.Kind() != reflect.Slice {
+		panic("InterfaceSlice() given a non-slice type")
 	}
-	result := strings.Join(values, delimiter)
-	fmt.Printf("%s", result)
+
+	fmt.Printf("%s", start)
+	for i := 0; i < s.Len(); i++ {
+		s := fmt.Sprintf(format, s.Index(i).Interface())
+		s += delimiter
+		fmt.Printf("%s", s)
+	}
 	fmt.Println(end)
 }
 
 func PrintTab() {
 	// First row
-	fmt.Printf(" x | ")
+	fmt.Printf("  x | ")
 	for i, x := range c {
 		var values []string
 		for _, y := range x {
@@ -240,15 +243,15 @@ func PrintTab() {
 	}
 
 	// Second row
-	var sumOx []float64
+	var sumOx []int
 
 	for _, x := range c {
-		sumOx = append(sumOx, float64(getSumOx(x)))
+		sumOx = append(sumOx, getSumOx(x))
 	}
-	printRow(sumOx, " Ox | ", " | ", " | 100")
+	printRow(sumOx, "%d", "  Ox    | ", "\t| ", "100")
 
 	// Third row
-	printRow(sumTxTmps, " Tx | ", " | ", " | 100")
+	printRow(sumTxTmps, "%.1f","  Tx    | ", "\t| ", "100")
 }
 
 // GetFreedomDegrees - get degrees of freedom
