@@ -22,7 +22,7 @@ var distributionTable = [][]float64 {
 	{2.09, 4.17, 5.38, 6.39, 7.36, 8.34, 9.41, 10.66, 12.24, 14.68, 16.92, 19.63, 21.67},
 	{2.56, 4.87, 6.18, 7.27, 8.30, 9.34, 10.47, 11.78, 13.44, 15.99, 18.31, 21.16, 23.21}}
 
-var fit = []string {
+var fits = []string {
 	"P > 99%",
 	"90% < P < 99%",
 	"80% < P < 90%",
@@ -229,13 +229,21 @@ func PrintTab() {
 	// First row
 	var xSlice []string
 
-	for _, x := range c {
+	for i, x := range c {
 		var values []string
+		var result string
+
 		for _, y := range x {
 			s := fmt.Sprintf("%d", int(y))
 			values = append(values, s)
 		}
-		result := strings.Join(values, "-")
+		if values != nil && i == len(c) - 1 {
+			result = values[0] + "+"
+		} else if values != nil && len(values) > 2 {
+			result = values[0] + "-" + values[len(values) - 1]
+		} else {
+			result = strings.Join(values, "-")
+		}
 		xSlice = append(xSlice, result)
 	}
 	printRow(xSlice, "%s", "   x\t| ", "\t| ", "Total")
@@ -254,22 +262,22 @@ func PrintTab() {
 
 // GetFreedomDegrees - get degrees of freedom
 func GetFreedomDegrees() int {
-	v := len(c) - 2
-	if v < 1 {
-		printError("v must be greater than one")
+	degrees := len(c) - 2
+	if degrees < 1 {
+		printError("Something went wrong, degrees of freedom must be greater than one")
 		os.Exit(84)
 	}
-	return v
+	return degrees
 }
 
-// GetFitValidity - get fit validity
+// GetFitValidity - get fits validity
 func GetFitValidity() string {
-	f := len(fit) - 1
-	for i, l := range distributionTable[v - 1] {
+	i := len(fits) - 1
+	for j, l := range distributionTable[v - 1] {
 		if d < l {
-			f = i
+			i = j
 			break
 		}
 	}
-	return fit[f]
+	return fits[i]
 }
