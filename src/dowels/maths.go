@@ -3,7 +3,6 @@ package dowels
 import (
 	"fmt"
 	"math"
-	"math/big"
 	"os"
 	"reflect"
 	"strings"
@@ -39,9 +38,10 @@ var fits = []string {
 	"P < 1%",
 }
 
-var sumTxSlice []float64
+var sSumTx []float64
+var sSumOX []int
 
-// GetProbability - compute p
+// GetProbability - get probability of the distribution
 func GetProbability() float64 {
 	sum := 0.0
 
@@ -52,160 +52,96 @@ func GetProbability() float64 {
 	return res
 }
 
-// Factorial - Get factorial big int
-func Factorial(x *big.Int) *big.Int {
-	result := big.NewInt(1)
-	i := big.NewInt(2)
+// GetChiSquared - get Chi-squared value
+func GetChiSquared() float64 {
+	res := 0.0
+	matrix := Dowels.matrix
+	sTx := Dowels.sTx
+	ssTx := utils.GetMatrixCopyOf(matrix)
+	ssLhs := utils.GetMatrixCopyOf(matrix)
 
-	if !x.IsInt64() {
-		fmt.Println("The number is way too big to calculate a factorial")
-		os.Exit(84)
-	}
-	for i.Cmp(x) != 1 {
-		result.Mul(result, i)
-		i = i.Add(i, big.NewInt(1))
-	}
-	return result
-}
-
-func getBinomialCoefficient(n *big.Int, k *big.Int) *big.Int {
-	if k.Cmp(n) == 1 {
-		fmt.Println("Error: k > n")
-		os.Exit(84)
+	//Fill 2D slices
+	k := 0
+	for i, r := range ssTx {
+		for j := range r {
+			ssTx[i][j] = sTx[k]
+			ssLhs[i][j] = float64(Ox[k]) - sTx[k]
+			k++
+		}
 	}
 
-	numerator := Factorial(n)
-	subNK := big.NewInt(1).Sub(n, k)
-	denominator := big.NewInt(1).Mul(Factorial(k), Factorial(subNK))
-	res := big.NewInt(1).Div(numerator, denominator)
+	// Get sum slices
+	var sumLhs []float64
+	for i, x := range matrix {
+		sum := 0.0
+		sumLhsRes := 0.0
+		for j, _ := range x {
+			sum += ssTx[i][j]
+			sumLhsRes += ssLhs[i][j]
+		}
+		sSumTx = append(sSumTx, sum)
+		sumLhs = append(sumLhs, sumLhsRes)
+	}
+
+	// Get the result
+	for i := range sSumTx {
+		lhs := 0.0
+		if sumLhs != nil {
+			lhs = math.Pow(sumLhs[i], 2)
+		}
+		res += lhs / sSumTx[i]
+	}
 	return res
 }
 
-// BigPow - big Float
-func BigPow(a *big.Float, e int64) *big.Float {
-	if e == 0 {
-		return big.NewFloat(1.0)
-	}
-	result := big.NewFloat(0.0).Copy(a)
-	for i := int64(0); i < e - 1; i++ {
-		result = result.Mul(result, a)
-	}
-	return result
-}
-
-func getBinomial(n int64, k int64, p float64) float64 {
-	res := big.NewFloat(0.0).Mul(
-		big.NewFloat(0.0).SetInt(getBinomialCoefficient(big.NewInt(0.0).SetInt64(n), big.NewInt(0.0).SetInt64(k))),
-		BigPow(big.NewFloat(0.0).SetFloat64(p), k))
-	res.Mul(res, BigPow(big.NewFloat(0.0).Sub(big.NewFloat(1.0), big.NewFloat(0.0).SetFloat64(p)), n - k))
-
-	s := fmt.Sprintf("%f", res)
-	resConverted := utils.ConvertStringToFloat(s)
-	return resConverted
-}
-
-func getSumOx(c []float64) int {
+func getSumOx(s []float64) int {
 	sum := 0
 
-	for _, value := range c {
+	for _, value := range s {
 		i := int(value)
 		sum += Ox[i]
 	}
 	return sum
 }
 
-func getD() float64 {
-	sumRes := 0.0
-	c := Dowels.c
-	tx := Dowels.tx
-
-	// Copy c to txTmp
-	txTmp := make([][]float64, len(c))
-	lhs := make([][]float64, len(c))
-	for i := range c {
-		txTmp[i] = make([]float64, len(c[i]))
-		lhs[i] = make([]float64, len(c[i]))
-	}
-
-	// Fill
-	k := 0
-	for i, r := range txTmp {
-		for j := range r {
-			txTmp[i][j] = tx[k]
-			lhs[i][j] = float64(Ox[k]) - tx[k]
-			k++
-		}
-	}
-
-	// Sum
-	var sumLhs []float64
-	for i, x := range c {
-		sum := 0.0
-		sumLhsRes := 0.0
-		for j, _ := range x {
-			sum += txTmp[i][j]
-			sumLhsRes += lhs[i][j]
-		}
-		sumTxSlice = append(sumTxSlice, sum)
-		sumLhs = append(sumLhs, sumLhsRes)
-	}
-
-	// SumRes
-	for i := range sumTxSlice {
-		lhs := 0.0
-		if sumLhs != nil {
-			lhs = math.Pow(sumLhs[i], 2)
-		}
-		sumRes +=  lhs / sumTxSlice[i]
-	}
-	return sumRes
-}
-
-func CreateMatrixSquare() [][]float64 {
+// GetMatrixSquare - get matrix square
+func GetMatrixSquare() [][]float64 {
 	row := 9
 	col := 1
-	c := make([][]float64, row)
+	matrix := make([][]float64, row)
 	rows := make([]float64, row * col)
 	for i := 0; i < row; i++ {
-		c[i] = rows[i * col : (i + 1) * col]
-		c[i][0] = float64(i)
+		matrix[i] = rows[i * col : (i + 1) * col]
+		matrix[i][0] = float64(i)
 	}
 
-	for i := 0; i < len(c); {
-		if getSumOx(c[i]) >= 10 {
+	for i := 0; i < len(matrix); {
+		if getSumOx(matrix[i]) >= 10 {
 			i++
 			continue
-		} else if (i + 1 == len(c)) || (i > 0 && getSumOx(c[i - 1]) < getSumOx(c[i + 1])) {
-			c[i - 1] = append(c[i - 1], c[i]...)
+		} else if (i + 1 == len(matrix)) || (i > 0 && getSumOx(matrix[i - 1]) < getSumOx(matrix[i + 1])) {
+			matrix[i - 1] = append(matrix[i - 1], matrix[i]...)
 			// Delete row
-			c = append(c[:i], c[i + 1:]...)
+			matrix = append(matrix[:i], matrix[i + 1:]...)
 			i -= 1
 		} else {
-			c[i] = append(c[i], c[i + 1]...)
+			matrix[i] = append(matrix[i], matrix[i + 1]...)
 			// Delete row
-			c = append(c[:i + 1], c[i + 2:]...)
+			matrix = append(matrix[:i + 1], matrix[i + 2:]...)
 		}
 	}
-	return c
+	return matrix
 }
 
-func getSum(slice []float64) float64 {
-	sum := 0.0
-
-	for _, e := range slice {
-		sum += e
-	}
-	return sum
-}
-
-func CreateTx() []float64 {
-	var tx []float64
+// GetTxValues - get slice of Tx values
+func GetTxValues() []float64 {
+	var s []float64
 
 	for i := range Ox[0:8] {
-		tx = append(tx, 100 * getBinomial(100, int64(i), Dowels.p))
+		s = append(s, 100 * utils.GetBinomial(100, int64(i), Dowels.probability))
 	}
-	tx = append(tx, 100 - getSum(tx))
-	return tx
+	s = append(s, 100 - utils.GetSum(s))
+	return s
 }
 
 func printRow(slice interface{}, format string, start string, delimiter string, end string) {
@@ -223,13 +159,19 @@ func printRow(slice interface{}, format string, start string, delimiter string, 
 	fmt.Println(end)
 }
 
-func PrintTab() {
-	c := Dowels.c
+func computeSumOxSlice() {
+	for _, x := range Dowels.matrix {
+		sSumOX = append(sSumOX, getSumOx(x))
+	}
+}
 
-	// First row
+// PrintTab - print tab of x, Ox, Tx
+func PrintTab() {
+	matrix := Dowels.matrix
 	var xSlice []string
 
-	for i, x := range c {
+	computeSumOxSlice()
+	for i, x := range matrix {
 		var values []string
 		var result string
 
@@ -237,7 +179,7 @@ func PrintTab() {
 			s := fmt.Sprintf("%d", int(y))
 			values = append(values, s)
 		}
-		if values != nil && i == len(c) - 1 {
+		if values != nil && i == len(matrix) - 1 {
 			result = values[0] + "+"
 		} else if values != nil && len(values) > 2 {
 			result = values[0] + "-" + values[len(values) - 1]
@@ -247,22 +189,13 @@ func PrintTab() {
 		xSlice = append(xSlice, result)
 	}
 	printRow(xSlice, "%s", "   x\t| ", "\t| ", "Total")
-
-	// Second row
-	var sumOx []int
-
-	for _, x := range c {
-		sumOx = append(sumOx, getSumOx(x))
-	}
-	printRow(sumOx, "%d", "  Ox\t| ", "\t| ", "100")
-
-	// Third row
-	printRow(sumTxSlice, "%.1f","  Tx\t| ", "\t| ", "100")
+	printRow(sSumOX, "%d", "  Ox\t| ", "\t| ", "100")
+	printRow(sSumTx, "%.1f","  Tx\t| ", "\t| ", "100")
 }
 
 // GetFreedomDegrees - get degrees of freedom
 func GetFreedomDegrees() int {
-	degrees := len(Dowels.c) - 2
+	degrees := len(Dowels.matrix) - 2
 
 	if degrees < 1 {
 		printError("Something went wrong, degrees of freedom must be greater than one")
@@ -275,8 +208,8 @@ func GetFreedomDegrees() int {
 func GetFitValidity() string {
 	i := len(fits) - 1
 
-	for j, l := range distributionTable[Dowels.v - 1] {
-		if Dowels.d < l {
+	for j, value := range distributionTable[Dowels.freedomDegrees- 1] {
+		if Dowels.chiSquared < value {
 			i = j
 			break
 		}

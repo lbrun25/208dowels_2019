@@ -13,28 +13,28 @@ var Dowels StructDowels
 
 // StructDowels - struct which holds the necessary values
 type StructDowels struct {
-	c[][]float64
-	d float64
-	tx []float64
-	p float64
-	v int
+	matrix         [][]float64
+	chiSquared     float64
+	sTx            []float64
+	probability    float64
+	freedomDegrees int
 }
 
 func displayResults() {
 	PrintTab()
-	fmt.Printf("Distribution:           B(100, %.4f)\n", Dowels.p)
-	fmt.Printf("Chi-squared:            %.3f\n", Dowels.d)
-	fmt.Printf("Degrees of freedom:     %d\n", Dowels.v)
+	fmt.Printf("Distribution:           B(100, %.4f)\n", Dowels.probability)
+	fmt.Printf("Chi-squared:            %.3f\n", Dowels.chiSquared)
+	fmt.Printf("Degrees of freedom:     %d\n", Dowels.freedomDegrees)
 	fmt.Printf("Fit validity:           %s\n", GetFitValidity())
 }
 
 // Main - Dowels' main
 func Main() {
-	Dowels.c = CreateMatrixSquare()
-	Dowels.p = GetProbability()
-	Dowels.tx = CreateTx()
-	Dowels.d = getD()
-	Dowels.v = GetFreedomDegrees()
+	Dowels.matrix = GetMatrixSquare()
+	Dowels.probability = GetProbability()
+	Dowels.sTx = GetTxValues()
+	Dowels.chiSquared = GetChiSquared()
+	Dowels.freedomDegrees = GetFreedomDegrees()
 
 	displayResults()
 }
